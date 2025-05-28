@@ -32,17 +32,14 @@ try:
                 print("Activé!" if activated else "Désactivé!")
 
         if activated:
-            # 🕹️ Use left analog stick (axis 0) for steering
-            steer_input = joystick.get_axis(0)  # -1 (left) to 1 (right)
+            steer_input = joystick.get_axis(0)
             steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
             steering = max(0.0, min(1.0, steering))
 
-            # Optional: throttle with axis 1
-            throttle_input = -joystick.get_axis(1)  # up is negative
+            throttle_input = -joystick.get_axis(1)
             speed = throttle_input * 0.05
             vesc.set_duty_cycle(speed)
 
-            # Send steering
             vesc.set_servo(steering)
             print(f"Steering: {steering:.2f} | Speed: {speed:.3f}")
 
