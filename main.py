@@ -14,8 +14,10 @@ joystick.init()
 
 vesc = VESC(serial_port="/dev/ttyACM0")
 
+MAX_SPEED = 0.05
+REVERSE_SPEED = -0.025
 STEERING_CENTER = 0.5
-STEERING_RANGE = 0.5
+STEERING_RANGE = 1
 BUTTON_A = 1
 activated = True
 
@@ -36,11 +38,14 @@ try:
             steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
             steering = max(0.0, min(1.0, steering))
 
-            throttle_input = -joystick.get_axis(1)
-            speed = throttle_input * 0.05
-            vesc.set_duty_cycle(speed)
+            if event.type == pygame.JOYBUTTONDOWN and event.button == 5:
+                speed = REVERSE_SPEED
+            else:
+                rt_input = joystick.get_axis(5)
+                speed = (rt_input + 1) * (MAX_SPEED / 2)
 
             vesc.set_servo(steering)
+            vesc.set_duty_cycle(speed)
             print(f"Steering: {steering:.2f} | Speed: {speed:.3f}")
 
         else:
