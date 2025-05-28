@@ -18,7 +18,10 @@ MAX_SPEED = 0.05
 REVERSE_SPEED = -0.025
 STEERING_CENTER = 0.5
 STEERING_RANGE = 1
+
 BUTTON_A = 1
+BUTTON_RB = 5
+
 activated = True
 
 screen = pygame.display.set_mode((500, 500))
@@ -38,7 +41,7 @@ try:
             steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
             steering = max(0.0, min(1.0, steering))
 
-            if event.type == pygame.JOYBUTTONDOWN and event.button == 5:
+            if event.type == pygame.JOYBUTTONDOWN and event.button == BUTTON_RB:
                 speed = REVERSE_SPEED
             else:
                 rt_input = joystick.get_axis(5)
