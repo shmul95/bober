@@ -55,7 +55,6 @@ with dai.Device(pipeline) as device:
         while True:
             # Handle camera frame
             frame = q_rgb.get().getCvFrame()
-            cv2.imshow("RGB Camera Only", frame)
 
             if '-p' in argv or '--preserve' in argv:
                 filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
@@ -91,9 +90,6 @@ with dai.Device(pipeline) as device:
             else:
                 vesc.set_duty_cycle(0)
 
-            if cv2.waitKey(1) == ord('q'):
-                break
-
             time.sleep(0.01)
 
     except KeyboardInterrupt:
@@ -102,5 +98,4 @@ with dai.Device(pipeline) as device:
         vesc.set_duty_cycle(0)
         vesc.set_servo(0.5)
         pygame.quit()
-        cv2.destroyAllWindows()
 
