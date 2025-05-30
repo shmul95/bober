@@ -19,7 +19,7 @@ joystick.init()
 
 vesc = VESC(serial_port="/dev/ttyACM0")
 
-MAX_SPEED = 0.35
+MAX_SPEED = 1.00
 REVERSE_SPEED = -0.025
 STEERING_CENTER = 0.5
 STEERING_RANGE = 1
