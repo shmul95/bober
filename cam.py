@@ -21,7 +21,6 @@ with dai.Device(pipeline) as device:
     q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
 
     frame_count = 0
-
     while True:
         frame = q_rgb.get().getCvFrame()
         cv2.imshow("RGB Camera Only", frame)
@@ -37,7 +36,8 @@ with dai.Device(pipeline) as device:
         frame_count += 1
 
         # Exit condition
-        if cv2.waitKey(1) == ord('q'):
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
             break
 
 cv2.destroyAllWindows()
