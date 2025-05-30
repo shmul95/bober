@@ -36,11 +36,6 @@ pygame.display.set_caption("Gamepad Control")
 # --- Main Loop ---
 try:
     while True:
-        if preserve:
-            filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
-        else:
-            filename = "data/frame.png"
-        print(f"Saved: {filename}")
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 raise KeyboardInterrupt
