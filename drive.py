@@ -41,7 +41,6 @@ try:
         else:
             filename = "data/frame.png"
         print(f"Saved: {filename}")
-        frame_count += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 raise KeyboardInterrupt
