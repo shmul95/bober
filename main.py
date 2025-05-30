@@ -1,7 +1,27 @@
+import depthai as dai
+import cv2
+import os
+from datetime import datetime
+from sys import argv
 import pygame
 from pyvesc.VESC import VESC
 import time
 
+# --- DepthAI Camera Setup ---
+pipeline = dai.Pipeline()
+
+cam_rgb = pipeline.create(dai.node.ColorCamera)
+cam_rgb.setPreviewSize(640, 480)
+cam_rgb.setInterleaved(False)
+cam_rgb.setFps(30)
+
+xout = pipeline.create(dai.node.XLinkOut)
+xout.setStreamName("rgb")
+cam_rgb.preview.link(xout.input)
+
+os.makedirs("data", exist_ok=True)
+
+# --- Gamepad & VESC Setup ---
 pygame.init()
 pygame.joystick.init()
 
@@ -24,42 +44,63 @@ BUTTON_RB = 5
 
 activated = True
 
-screen = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("Gamepad Control")
 
-try:
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                raise KeyboardInterrupt
-            elif event.type == pygame.JOYBUTTONDOWN and event.button == BUTTON_A:
-                activated = not activated
-                print("Activé!" if activated else "Désactivé!")
+# --- Main Loop ---
+with dai.Device(pipeline) as device:
+    q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
+    frame_count = 0
 
-        if activated:
-            steer_input = joystick.get_axis(0)
-            steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
-            steering = max(0.0, min(1.0, steering))
+    try:
+        while True:
+            # Handle camera frame
+            frame = q_rgb.get().getCvFrame()
+            cv2.imshow("RGB Camera Only", frame)
 
-            if event.type == pygame.JOYBUTTONDOWN and event.button == BUTTON_RB:
-                speed = REVERSE_SPEED
+            if '-p' in argv or '--preserve' in argv:
+                filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
             else:
-                rt_input = joystick.get_axis(5)
-                speed = (rt_input + 1) * (MAX_SPEED / 2)
+                filename = "data/frame.png"
 
-            vesc.set_servo(steering)
-            vesc.set_duty_cycle(speed)
-            print(f"Steering: {steering:.2f} | Speed: {speed:.3f}")
+            cv2.imwrite(filename, frame)
+            print(f"Saved: {filename}")
+            frame_count += 1
 
-        else:
-            vesc.set_duty_cycle(0)
+            # Handle gamepad events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    raise KeyboardInterrupt
+                elif event.type == pygame.JOYBUTTONDOWN and event.button == BUTTON_A:
+                    activated = not activated
+                    print("Activé!" if activated else "Désactivé!")
 
-        time.sleep(0.01)
+            if activated:
+                steer_input = joystick.get_axis(0)
+                steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
+                steering = max(0.0, min(1.0, steering))
 
-except KeyboardInterrupt:
-    pass
-finally:
-    vesc.set_duty_cycle(0)
-    vesc.set_servo(0.5)
-    pygame.quit()
+                if joystick.get_button(BUTTON_RB):
+                    speed = REVERSE_SPEED
+                else:
+                    rt_input = joystick.get_axis(5)
+                    speed = (rt_input + 1) * (MAX_SPEED / 2)
+
+                vesc.set_servo(steering)
+                vesc.set_duty_cycle(speed)
+                print(f"Steering: {steering:.2f} | Speed: {speed:.3f}")
+            else:
+                vesc.set_duty_cycle(0)
+
+            if cv2.waitKey(1) == ord('q'):
+                break
+
+            time.sleep(0.01)
+
+    except KeyboardInterrupt:
+        pass
+    finally:
+        vesc.set_duty_cycle(0)
+        vesc.set_servo(0.5)
+        pygame.quit()
+        cv2.destroyAllWindows()
 
