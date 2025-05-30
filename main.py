@@ -40,9 +40,11 @@ STEERING_CENTER = 0.5
 STEERING_RANGE = 1
 
 BUTTON_A = 1
+BUTTON_B = 2
 BUTTON_RB = 5
 
 activated = True
+preserve = False
 
 pygame.display.set_caption("Gamepad Control")
 
@@ -53,10 +55,9 @@ with dai.Device(pipeline) as device:
 
     try:
         while True:
-            # Handle camera frame
             frame = q_rgb.get().getCvFrame()
 
-            if '-p' in argv or '--preserve' in argv:
+            if preserve:
                 filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
             else:
                 filename = "data/frame.png"
@@ -65,13 +66,15 @@ with dai.Device(pipeline) as device:
             print(f"Saved: {filename}")
             frame_count += 1
 
-            # Handle gamepad events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     raise KeyboardInterrupt
+                elif event.type == pygame.JOYBUTTONDOWN and event.button == BUTTON_B:
+                    preserve = not preserve
+                    print("preserve" if preserve else "not preserve")
                 elif event.type == pygame.JOYBUTTONDOWN and event.button == BUTTON_A:
                     activated = not activated
-                    print("Activé!" if activated else "Désactivé!")
+                    print("autonomous" if activated else "not autonomous")
 
             if activated:
                 steer_input = joystick.get_axis(0)
