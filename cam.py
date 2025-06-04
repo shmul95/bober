@@ -17,7 +17,7 @@ cam_rgb.preview.link(xout.input)
 
 os.makedirs("data", exist_ok=True)
 
-with dai.Device(pipeline) as device:
+with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
     q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
 
     frame_count = 0
@@ -31,14 +31,12 @@ with dai.Device(pipeline) as device:
             filename = datetime.now().strftime("data/frame.png")
 
         cv2.imwrite(filename, frame)
-        print(f"Saved: {filename}")
+        print("Saved: {}".format(filename))
 
         frame_count += 1
 
-        # Exit condition
         key = cv2.waitKey(1) & 0xFF
         if key == ord('q'):
             break
 
 cv2.destroyAllWindows()
-
