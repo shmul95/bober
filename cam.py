@@ -7,9 +7,9 @@ from sys import argv
 pipeline = dai.Pipeline()
 
 cam_rgb = pipeline.create(dai.node.ColorCamera)
-cam_rgb.setPreviewSize(160, 120)
+cam_rgb.setPreviewSize(640, 480)
 cam_rgb.setInterleaved(False)
-cam_rgb.setFps(1)
+cam_rgb.setFps(30)
 
 xout = pipeline.create(dai.node.XLinkOut)
 xout.setStreamName("rgb")
@@ -17,10 +17,11 @@ cam_rgb.preview.link(xout.input)
 
 os.makedirs("data", exist_ok=True)
 
-with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
+with dai.Device(pipeline) as device:
     q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
 
     frame_count = 0
+
     while True:
         frame = q_rgb.get().getCvFrame()
         cv2.imshow("RGB Camera Only", frame)
@@ -31,12 +32,13 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
             filename = datetime.now().strftime("data/frame.png")
 
         cv2.imwrite(filename, frame)
-        print("Saved: {}".format(filename))
+        print(f"Saved: {filename}")
 
         frame_count += 1
 
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):
+        # Exit condition
+        if cv2.waitKey(1) == ord('q'):
             break
 
 cv2.destroyAllWindows()
+
