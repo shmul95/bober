@@ -16,10 +16,10 @@ cam.setFps(15)           # 15 fps instead of 30 fps
 # cam_rgb.setPreviewSize(320, 240)
 # cam_rgb.setInterleaved(False)
 # cam_rgb.setFps(1)
-#
-# xout = pipeline.create(dai.node.XLinkOut)
-# xout.setStreamName("rgb")
-# cam_rgb.preview.link(xout.input)
+
+xout = pipeline.create(dai.node.XLinkOut)
+xout.setStreamName("rgb")
+cam.preview.link(xout.input)
 
 os.makedirs("data", exist_ok=True)
 
