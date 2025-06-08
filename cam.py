@@ -6,14 +6,20 @@ from sys import argv
 
 pipeline = dai.Pipeline()
 
-cam_rgb = pipeline.create(dai.node.ColorCamera)
-cam_rgb.setPreviewSize(320, 240)
-cam_rgb.setInterleaved(False)
-cam_rgb.setFps(1)
+cam = pipeline.createColorCamera()
+cam.setBoardSocket(dai.CameraBoardSocket.RGB)
+cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)  # or a lower one
+cam.setIspScale(2, 2)    # e.g. 1080 p → 540 p
+cam.setFps(15)           # 15 fps instead of 30 fps
 
-xout = pipeline.create(dai.node.XLinkOut)
-xout.setStreamName("rgb")
-cam_rgb.preview.link(xout.input)
+# cam_rgb = pipeline.create(dai.node.ColorCamera)
+# cam_rgb.setPreviewSize(320, 240)
+# cam_rgb.setInterleaved(False)
+# cam_rgb.setFps(1)
+#
+# xout = pipeline.create(dai.node.XLinkOut)
+# xout.setStreamName("rgb")
+# cam_rgb.preview.link(xout.input)
 
 os.makedirs("data", exist_ok=True)
 
