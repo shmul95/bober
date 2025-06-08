@@ -7,9 +7,9 @@ from sys import argv
 pipeline = dai.Pipeline()
 
 cam_rgb = pipeline.create(dai.node.ColorCamera)
-cam_rgb.setPreviewSize(640, 480)
+cam_rgb.setPreviewSize(160, 120)
 cam_rgb.setInterleaved(False)
-cam_rgb.setFps(30)
+cam_rgb.setFps(1)
 
 xout = pipeline.create(dai.node.XLinkOut)
 xout.setStreamName("rgb")
