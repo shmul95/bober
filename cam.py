@@ -9,7 +9,7 @@ pipeline = dai.Pipeline()
 cam_rgb = pipeline.create(dai.node.ColorCamera)
 cam_rgb.setPreviewSize(320, 240)
 cam_rgb.setInterleaved(False)
-cam_rgb.setFps(1)
+cam_rgb.setFps(15)
 
 xout = pipeline.create(dai.node.XLinkOut)
 xout.setStreamName("rgb")
