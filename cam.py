@@ -7,7 +7,7 @@ from sys import argv
 pipeline = dai.Pipeline()
 
 cam_rgb = pipeline.create(dai.node.ColorCamera)
-cam_rgb.setPreviewSize(640, 480)
+cam_rgb.setPreviewSize(320, 240)
 cam_rgb.setInterleaved(False)
 cam_rgb.setFps(1)
 
