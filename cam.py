@@ -17,7 +17,7 @@ cam_rgb.preview.link(xout.input)
 
 os.makedirs("data", exist_ok=True)
 
-with dai.Device(pipeline) as device:
+with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
     q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
 
     frame_count = 0
