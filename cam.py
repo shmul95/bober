@@ -28,17 +28,19 @@ os.makedirs("data", exist_ok=True)
 
 with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
     q = device.getOutputQueue(name="nv12", maxSize=1, blocking=False)
+    frm = q.get()
+    w = frm.getWidth()
+    h = frm.getHeight()
 
     frame_count = 0
 
     while True:
         # getData() returns a bytes buffer of NV12 (YUV) data
-        nv12_bytes = q.get().getData()
-        # compute width/height from the frame shape
-        w = cam.getResolutionSize().width  // 2   # ispScale(2,2) halves it
-        h = cam.getResolutionSize().height // 2
+        nv12_bytes = frm.getData()
+
         # reshape into (h * 3/2, w) for NV12
         yuv = np.frombuffer(nv12_bytes, dtype=np.uint8).reshape((h * 3 // 2, w))
+
         # convert to BGR
         frame = cv2.cvtColor(yuv, cv2.COLOR_YUV2BGR_NV12)
         path = "data/frame_bgr.png"
