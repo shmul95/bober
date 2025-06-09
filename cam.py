@@ -25,13 +25,13 @@ cam.preview.link(xout.input)
 os.makedirs("data", exist_ok=True)
 
 with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
-    q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
+    q_rgb = device.getOutputQueue(name="rgb", maxSize=1, blocking=False)
 
     frame_count = 0
 
     while True:
         frame = q_rgb.get().getCvFrame()
-        cv2.imshow("RGB Camera Only", frame)
+        # cv2.imshow("RGB Camera Only", frame)
 
         if '-p' in argv or '--preserve' in argv:
             filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
@@ -42,10 +42,7 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
         print(f"Saved: {filename}")
 
         frame_count += 1
-
-        # Exit condition
-        if cv2.waitKey(1) == ord('q'):
-            break
+        if cv2.waitKey(1) == ord('q'): break
 
 cv2.destroyAllWindows()
 
