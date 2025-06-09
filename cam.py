@@ -32,10 +32,8 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.SUPER) as device:
         frame = q_rgb.get().getCvFrame()
         cv2.imshow("RGB Camera Only", frame)
 
-        if '-p' in argv or '--preserve' in argv:
-            filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
-        else:
-            filename = datetime.now().strftime("data/frame.png")
+        if '-p' in argv or '--preserve' in argv : filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
+        else                                    : filename = datetime.now().strftime("data/frame.png")
 
         cv2.imwrite(filename, frame)
         print(f"Saved: {filename}")
