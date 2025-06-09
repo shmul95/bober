@@ -32,24 +32,21 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
     frame_count = 0
 
     while True:
-        try:
-            # getData() returns a bytes buffer of NV12 (YUV) data
-            nv12_bytes = q.get().getData()
-            # compute width/height from the frame shape
-            w = cam.getResolutionSize().width  // 2   # ispScale(2,2) halves it
-            h = cam.getResolutionSize().height // 2
-            # reshape into (h * 3/2, w) for NV12
-            yuv = np.frombuffer(nv12_bytes, dtype=np.uint8).reshape((h * 3 // 2, w))
-            # convert to BGR
-            frame = cv2.cvtColor(yuv, cv2.COLOR_YUV2BGR_NV12)
-            path = "data/frame_bgr.png"
-            cv2.imwrite(path, frame)
-            print(f"Saved color frame to {path}")
-            cv2.imshow("Color Frame", frame)
-            cv2.waitKey(0)
-
-        except: print("an Error Occured")
-        finally: cv2.destroyAllWindows()
+        # getData() returns a bytes buffer of NV12 (YUV) data
+        nv12_bytes = q.get().getData()
+        # compute width/height from the frame shape
+        w = cam.getResolutionSize().width  // 2   # ispScale(2,2) halves it
+        h = cam.getResolutionSize().height // 2
+        # reshape into (h * 3/2, w) for NV12
+        yuv = np.frombuffer(nv12_bytes, dtype=np.uint8).reshape((h * 3 // 2, w))
+        # convert to BGR
+        frame = cv2.cvtColor(yuv, cv2.COLOR_YUV2BGR_NV12)
+        path = "data/frame_bgr.png"
+        cv2.imwrite(path, frame)
+        print(f"Saved color frame to {path}")
+        cv2.imshow("Color Frame", frame)
+        cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
         # frame = q.get().getCvFrame()
         # cv2.imshow("RGB Camera Only", frame)
