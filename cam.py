@@ -32,6 +32,10 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
         arr = np.asarray(bytearray(jpg_bytes), dtype=np.uint8)
         print("Array shape:", arr.shape, "dtype:", arr.dtype)
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+        if frame is None:
+            print("💥 JPEG decode failed! First bytes:", arr[:4], "Last bytes:", arr[-4:])
+        else:
+            cv2.imwrite(path, frame)
 
         path = "data/frame.jpg"
         cv2.imwrite(path, frame)
