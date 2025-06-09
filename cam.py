@@ -31,7 +31,7 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
 
     while True:
         frame = q_rgb.get().getCvFrame()
-        # cv2.imshow("RGB Camera Only", frame)
+        cv2.imshow("RGB Camera Only", frame)
 
         if '-p' in argv or '--preserve' in argv:
             filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
