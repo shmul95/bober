@@ -28,7 +28,7 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
     while True:
         enc = q.get()
         jpg_bytes = enc.getData()
-        arr = np.frombuffer(jpg_bytes, dtype=np.uint8)
+        arr = np.frombuffer(jpg_bytes, dtype=np.uint8).copy()
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
         path = "data/frame.jpg"
