@@ -1,61 +1,50 @@
 import depthai as dai
 import cv2
 import os
-import numpy as np
+from datetime import datetime
+from sys import argv
 
-# 1) Pipeline
 pipeline = dai.Pipeline()
+
 cam = pipeline.createColorCamera()
-cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-cam.setFps(1)   # one photo per run
+cam.setBoardSocket(dai.CameraBoardSocket.RGB)
+cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)  # or a lower one
+cam.setIspScale(2, 2)    # e.g. 1080 p → 540 p
+cam.setFps(15)           # 15 fps instead of 30 fps
 
-# 2) JPEG encoder
-videoEnc = pipeline.createVideoEncoder()
-videoEnc.setDefaultProfilePreset(cam.getFps(), dai.VideoEncoderProperties.Profile.MJPEG)
-cam.video.link(videoEnc.input)
+# cam_rgb = pipeline.create(dai.node.ColorCamera)
+# cam_rgb.setPreviewSize(320, 240)
+# cam_rgb.setInterleaved(False)
+# cam_rgb.setFps(1)
 
-# 3) XLinkOut for JPEG
-xout = pipeline.createXLinkOut()
-xout.setStreamName("jpeg")
-videoEnc.bitstream.link(xout.input)
+xout = pipeline.create(dai.node.XLinkOut)
+xout.setStreamName("rgb")
+cam.preview.link(xout.input)
 
-with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
-    q = device.getOutputQueue(name="jpeg", maxSize=1, blocking=True)
+os.makedirs("data", exist_ok=True)
+
+with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.SUPER) as device:
+    q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
 
     frame_count = 0
 
     while True:
-        enc = q.get()
-        jpg_bytes = enc.getData()
-        print("JPEG byte length:", len(jpg_bytes))
-        arr = np.asarray(bytearray(jpg_bytes), dtype=np.uint8)
-        print("Array shape:", arr.shape, "dtype:", arr.dtype)
-        frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-        if frame is None:
-            print("💥 JPEG decode failed! First bytes:", arr[:4], "Last bytes:", arr[-4:])
+        frame = q_rgb.get().getCvFrame()
+        cv2.imshow("RGB Camera Only", frame)
+
+        if '-p' in argv or '--preserve' in argv:
+            filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
         else:
-            cv2.imwrite(path, frame)
+            filename = datetime.now().strftime("data/frame.png")
 
-        path = "data/frame.jpg"
-        cv2.imwrite(path, frame)
-        print(f"Saved JPEG frame to {path}")
+        cv2.imwrite(filename, frame)
+        print(f"Saved: {filename}")
 
-        cv2.imshow("JPEG Frame", frame)
-        cv2.waitKey(0)
+        frame_count += 1
 
-        # frame = q.get().getCvFrame()
-        # cv2.imshow("RGB Camera Only", frame)
-        #
-        # if '-p' in argv or '--preserve' in argv:
-        #     filename = datetime.now().strftime("data/frame_%Y%m%d_%H%M%S_%f.png")
-        # else:
-        #     filename = datetime.now().strftime("data/frame.png")
-        #
-        # cv2.imwrite(filename, frame)
-        # print(f"Saved: {filename}")
-        #
-        # frame_count += 1
-        # if cv2.waitKey(1) == ord('q'): break
+        # Exit condition
+        if cv2.waitKey(1) == ord('q'):
+            break
 
+cv2.destroyAllWindows()
 
