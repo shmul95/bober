@@ -7,10 +7,10 @@ from sys import argv
 pipeline = dai.Pipeline()
 
 cam = pipeline.createColorCamera()
-cam.setBoardSocket(dai.CameraBoardSocket.RGB)
-cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)  # or a lower one
-cam.setIspScale(2, 2)    # e.g. 1080 p → 540 p
-cam.setFps(15)           # 15 fps instead of 30 fps
+cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+cam.setIspScale(2, 2)
+cam.setFps(1)
 
 # cam_rgb = pipeline.create(dai.node.ColorCamera)
 # cam_rgb.setPreviewSize(320, 240)
@@ -41,10 +41,7 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.SUPER) as device:
         print(f"Saved: {filename}")
 
         frame_count += 1
-
-        # Exit condition
-        if cv2.waitKey(1) == ord('q'):
-            break
+        if cv2.waitKey(1) == ord('q'): break
 
 cv2.destroyAllWindows()
 
