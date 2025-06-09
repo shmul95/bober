@@ -30,7 +30,7 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
         jpg_bytes = enc.getData()
         print("JPEG byte length:", len(jpg_bytes))
         arr = np.asarray(bytearray(jpg_bytes), dtype=np.uint8)
-        print("JPEG byte length:", len(jpg_bytes))
+        print("Array shape:", arr.shape, "dtype:", arr.dtype)
         frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
         path = "data/frame.jpg"
