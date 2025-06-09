@@ -2,53 +2,41 @@ import depthai as dai
 import cv2
 import os
 import numpy as np
-# from datetime import datetime
-# from sys import argv
 
+# 1) Pipeline
 pipeline = dai.Pipeline()
-
 cam = pipeline.createColorCamera()
 cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)  # or a lower one
-cam.setIspScale(2, 2)    # e.g. 1080 p → 540 p
-cam.setFps(1)           # 15 fps instead of 30 fps
-cam.setInterleaved(True)
+cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+cam.setFps(1)   # one photo per run
 
-# cam_rgb = pipeline.create(dai.node.ColorCamera)
-# cam_rgb.setPreviewSize(320, 240)
-# cam_rgb.setInterleaved(False)
-# cam_rgb.setFps(1)
+# 2) JPEG encoder
+videoEnc = pipeline.createVideoEncoder()
+videoEnc.setDefaultProfilePreset(cam.getFps(), dai.VideoEncoderProperties.Profile.MJPEG)
+cam.video.link(videoEnc.input)
 
-xout = pipeline.create(dai.node.XLinkOut)
-# xout.setStreamName("rgb")
-xout.setStreamName("nv12")
-cam.preview.link(xout.input)
-
-os.makedirs("data", exist_ok=True)
+# 3) XLinkOut for JPEG
+xout = pipeline.createXLinkOut()
+xout.setStreamName("jpeg")
+videoEnc.bitstream.link(xout.input)
 
 with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
-    q = device.getOutputQueue(name="nv12", maxSize=1, blocking=False)
-    frm = q.get()
-    w = frm.getWidth()
-    h = frm.getHeight()
+    q = device.getOutputQueue(name="jpeg", maxSize=1, blocking=True)
 
     frame_count = 0
 
     while True:
-        # getData() returns a bytes buffer of NV12 (YUV) data
-        nv12_bytes = frm.getData()
+        enc = q.get()
+        jpg_bytes = enc.getData()
+        arr = np.frombuffer(jpg_bytes, dtype=np.uint8)
+        frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
-        # reshape into (h * 3/2, w) for NV12
-        yuv = np.frombuffer(nv12_bytes, dtype=np.uint8).reshape((h * 3 // 2, w))
-
-        # convert to BGR
-        frame = cv2.cvtColor(yuv, cv2.COLOR_YUV2BGR_NV12)
-        path = "data/frame_bgr.png"
+        path = "data/frame.jpg"
         cv2.imwrite(path, frame)
-        print(f"Saved color frame to {path}")
-        cv2.imshow("Color Frame", frame)
+        print(f"Saved JPEG frame to {path}")
+
+        cv2.imshow("JPEG Frame", frame)
         cv2.waitKey(0)
-        # cv2.destroyAllWindows()
 
         # frame = q.get().getCvFrame()
         # cv2.imshow("RGB Camera Only", frame)
