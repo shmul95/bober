@@ -11,7 +11,7 @@ cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
 cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
 cam.setPreviewSize(320, 240)
 cam.setIspScale(2, 2)
-cam.setFps(5)
+cam.setFps(15)
 
 # cam_rgb = pipeline.create(dai.node.ColorCamera)
 # cam_rgb.setInterleaved(False)
