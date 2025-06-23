@@ -19,17 +19,14 @@ joystick.init()
 
 vesc = VESC(serial_port="/dev/ttyACM0")
 
-MAX_SPEED = 0.99
+MAX_SPEED = 0.05
 REVERSE_SPEED = -0.05
-STEERING_CENTER = 0.49
+STEERING_CENTER = 0.5
 STEERING_RANGE = 1
 
 BUTTON_A = 1
 BUTTON_B = 2
-BUTTON_LB = 4
 BUTTON_RB = 5
-BUTTON_LT = 2
-BUTTON_RT = 5
 
 activated = True
 preserve = False
@@ -52,11 +49,10 @@ try:
             steer_input = joystick.get_axis(0)
             steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
             steering = max(0.0, min(1.0, steering))
-            lt_input = joystick.get_axis(BUTTON_LT)
-            if lt_input != -1:
-                speed = (lt_input + 1) * (REVERSE_SPEED / 2)
+            if joystick.get_button(BUTTON_RB):
+                speed = REVERSE_SPEED
             else:
-                rt_input = joystick.get_axis(BUTTON_RT)
+                rt_input = joystick.get_axis(5)
                 speed = (rt_input + 1) * (MAX_SPEED / 2)
             vesc.set_servo(steering)
             vesc.set_duty_cycle(speed)

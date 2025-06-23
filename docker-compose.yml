@@ -1,0 +1,18 @@
+services:
+  drive:
+    build: ./drive
+    runtime: nvidia          # ancienne syntaxe
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - SDL_VIDEODRIVER=dummy
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+      - /dev/input/js0:/dev/input/js0
+    networks:
+      - robocar-net
