@@ -20,6 +20,9 @@ RUN git clone --depth 1 https://github.com/shmul95/pyvesc.git /tmp/pyvesc \
  && mv /tmp/pyvesc /usr/local/lib/python3.12/site-packages/pyvesc \
  && rm -rf /tmp/pyvesc
 
+COPY action_config.json .
 COPY drive.py .
+COPY autopilot.py .
+COPY car.py .
 
-CMD ["python", "drive.py"]
+CMD ["python", "car.py"]

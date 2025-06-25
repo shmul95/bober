@@ -1,4 +1,4 @@
 depthai
 flask
-matplotlib>=3.4,<3.8
+matplotlib>=3.3.4,<3.4
 importlib_resources>=3.2

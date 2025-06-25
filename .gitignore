@@ -1,4 +1,6 @@
 venv*
 data/
 *.pth
+*~
+ia_c/
 __pycache__/
