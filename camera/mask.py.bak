@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import cv2
 import numpy as np
@@ -53,8 +52,6 @@ class UNet(nn.Module):
 # -----------------------------
 model = UNet().to(DEVICE)
 model.load_state_dict(torch.load("unet_pytorch.pth", map_location=DEVICE))
-model = model.half().to(DEVICE)
-torch.backends.cudnn.benchmark = True
 model.eval()
 
 # -----------------------------
@@ -70,7 +67,7 @@ pipeline = dai.Pipeline()
 cam = pipeline.create(dai.node.ColorCamera)
 cam.setBoardSocket(dai.CameraBoardSocket.RGB)
 cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-cam.setPreviewSize(IMG_W, IMG_H)
+cam.setIspScale(1, 1)
 cam.setFps(30)
 
 xout = pipeline.create(dai.node.XLinkOut)
@@ -78,44 +75,46 @@ xout.setStreamName("rgb")
 cam.preview.link(xout.input)
 
 # -----------------------------
-# 6) Main loop: inference + raycasts
+# 6) Main loop: save raw, inference + raycasts
 # -----------------------------
 with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
     q = device.getOutputQueue(name="rgb", maxSize=4, blocking=False)
-    frame_idx = 0
 
+    frame_idx = 0
     while True:
         in_rgb = q.get()
         frame  = in_rgb.getCvFrame()
- 
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        raw_path = os.path.join(OUT_DIR, "raw_frame.png")
+        cv2.imwrite(raw_path, frame)
+
+        img = cv2.resize(frame, (IMG_W, IMG_H))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         tensor = (torch.from_numpy(img)
                          .permute(2, 0, 1)
                          .unsqueeze(0)
-                         .half()
-                         / 255.0
+                         .float() / 255.0
                   ).to(DEVICE)
 
-        # forward
         with torch.no_grad():
             pred = torch.sigmoid(model(tensor))[0,0].cpu().numpy()
         mask = (pred > 0.5).astype(np.uint8) * 255
-
-        # raycasts (annotation disabled for perf)
-        distances, _ = get_raycasts(
+        mask_path = os.path.join(OUT_DIR, "prediction_mask.png")
+        cv2.imwrite(mask_path, mask)
+        distances, annotated = get_raycasts(
             cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR),
-            number_ray=40, fov=180, annotate=False
+            number_ray=40, fov=180
         )
-
-        # write distances only
         dist_path = os.path.join(OUT_DIR, "distance.txt")
         with open(dist_path, "w") as f:
             f.write(",".join(str(d) for d in distances))
 
-        frame_idx += 1
-        print(f"[Frame {frame_idx}]")
+        anno_path = os.path.join(OUT_DIR, "annotated.png")
+        cv2.imwrite(anno_path, annotated)
 
-        # stop flag
+        frame_idx += 1
+        print(f"[Frame {frame_idx}] save")
+
         if os.path.exists(os.path.join(OUT_DIR, "stop.flag")):
-            print("→ fin de la boucle")
+            print("fin de la boucle")
             break
