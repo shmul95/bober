@@ -4,25 +4,25 @@ ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1
 ENV LD_LIBRARY_PATH=/usr/local/cuda/targets/aarch64-linux/lib:$LD_LIBRARY_PATH
 WORKDIR /app
 
-# 1) On supprime le dépôt Kitware (cause erreur GPG), 
-#    puis on installe nos paquets système
+# 1) Clean up and install system packages
 RUN rm -f /etc/apt/sources.list.d/kitware* \
  && sed -i '/kitware/d' /etc/apt/sources.list \
-  && apt-get update \
-   && apt-get install -y \
-         libusb-1.0-0 libusb-1.0-0-dev libudev1 \
-	       libgl1-mesa-glx libglib2.0-0 \
-	             python3-opencv python3-numpy python3-pip \
-		      && rm -rf /var/lib/apt/lists/*
-		      
+ && apt-get update \
+ && apt-get install -y \
+        libusb-1.0-0 libusb-1.0-0-dev libudev1 \
+        libgl1-mesa-glx libglib2.0-0 \
+        python3-opencv python3-numpy python3-pip \
+ && rm -rf /var/lib/apt/lists/*
+
+# 2) Install Python dependencies
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel \
- && pip3 install --no-cache-dir -r requirements.txt \
- && pip3 install --no-cache-dir importlib_resources
+ && pip3 install --no-cache-dir -r requirements.txt
 
-# 3) Copier scripts et modèle
-COPY mask.py .
+# 3) Copy application files
 COPY raycast.py .
-COPY unet_pytorch.pth .
+COPY test_blob_on_oakd.py .
+COPY unet_openvino_2022.1_6shave.blob .
 
-CMD ["python3", "mask.py"]
+# 4) Run the new DepthAI-based script
+CMD ["python3", "test_blob_on_oakd.py"]
