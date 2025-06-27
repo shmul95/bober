@@ -90,7 +90,6 @@ try:
             # — mode manuel —
             steer_in = joy.get_axis(AXIS_STEER)
             steering = STEERING_CENTER + steer_in * STEERING_RANGE/2
-            steering += STEERING_OFFSET
             steering = np.clip(steering, 0.0, 1.0)
 
             lt = joy.get_axis(AXIS_LT)
@@ -100,6 +99,8 @@ try:
                 rt = joy.get_axis(AXIS_RT)
                 speed = (rt + 1)* (MAX_SPEED/2)
 
+            steering += STEERING_OFFSET
+            print("lolilol")
             vesc.set_servo(steering)
             vesc.set_duty_cycle(speed)
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
