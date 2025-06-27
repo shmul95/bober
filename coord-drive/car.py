@@ -48,8 +48,10 @@ last_time = time.time()
 
 def update_position(x, y, theta, speed, steer, dt):
     steer_angle = (steer - 0.5) * 2 * MAX_STEERING_ANGLE
+    print(speed, theta, dt)
     dx = speed * math.cos(theta) * dt
     dy = speed * math.sin(theta) * dt
+    print(dx, dy)
     dtheta = math.tan(steer_angle) * speed * dt  # simplified kinematics
     x += dx
     y += dy
