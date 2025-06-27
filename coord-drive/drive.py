@@ -23,6 +23,7 @@ MAX_SPEED = 0.05
 REVERSE_SPEED = -0.05
 STEERING_CENTER = 0.5
 STEERING_RANGE = 1
+STEERING_OFFSET = -0.01
 
 BUTTON_A = 1
 BUTTON_B = 2
@@ -48,6 +49,7 @@ try:
         if activated:
             steer_input = joystick.get_axis(0)
             steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
+            steering += STEERING_OFFSET
             steering = max(0.0, min(1.0, steering))
             if joystick.get_button(BUTTON_RB):
                 speed = REVERSE_SPEED
