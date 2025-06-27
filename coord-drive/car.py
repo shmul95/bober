@@ -95,7 +95,6 @@ try:
                     mode = "AUTOPILOT" if is_autopilot else "MANUEL"
                     print(f"🔄 Passage en mode {mode}")
                 elif event.button == BUTTON_Y:
-                    print("plot !")
                     if track:
                         df = pd.DataFrame(track, columns=["x", "y", "timestamp"])
                         plt.plot(df["x"], df["y"], marker='o')
@@ -104,7 +103,9 @@ try:
                         plt.ylabel("y")
                         plt.axis("equal")
                         plt.grid(True)
-                        plt.show()
+                        plt.savefig("plot.png")
+                        plt.close()
+                        print("📸 Trajectory saved to plot.png")
                 elif event.button == BUTTON_X:
                     print("🗑️ Reset triggered via window X")
                     x, y, theta = 0.0, 0.0, 0.0
