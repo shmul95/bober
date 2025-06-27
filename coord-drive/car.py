@@ -47,10 +47,11 @@ track = []  # Will hold (x, y, timestamp)
 last_time = time.time()
 
 def update_position(x, y, theta, speed, steer, dt):
+    steering_bias = 30
     steer_angle = (steer - 0.5) * 2 * MAX_STEERING_ANGLE
     dx = speed * math.cos(theta) * dt
     dy = speed * math.sin(theta) * dt
-    dtheta = math.tan(steer_angle) * speed * dt  # simplified kinematics
+    dtheta = math.tan(steer_angle) * speed * dt * steering_bias  # simplified kinematics
     x += dx
     y += dy
     theta += dtheta
