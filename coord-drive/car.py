@@ -17,7 +17,7 @@ MAX_SPEED      = 0.30
 REVERSE_SPEED  = -0.05
 STEERING_CENTER = 0.5
 STEERING_RANGE  = 1.0
-STEERING_OFFSET = -0.2
+STEERING_OFFSET = -0.02
 
 # --- Constantes Autopilot ---
 ACTION_CFG_PATH = "action_config.json"
@@ -100,7 +100,6 @@ try:
                 speed = (rt + 1)* (MAX_SPEED/2)
 
             steering += STEERING_OFFSET
-            print("lolilol")
             vesc.set_servo(steering)
             vesc.set_duty_cycle(speed)
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
