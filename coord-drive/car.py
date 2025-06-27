@@ -154,8 +154,7 @@ try:
                 rt = joy.get_axis(AXIS_RT)
                 speed = (rt + 1)* (MAX_SPEED/2)
 
-            steering += STEERING_OFFSET
-            vesc.set_servo(steering)
+            vesc.set_servo(steering + STEERING_OFFSET)
             vesc.set_duty_cycle(speed)
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
 
