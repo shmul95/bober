@@ -4,6 +4,7 @@ import json
 import numpy as np
 import pygame
 from collections import deque
+from drive import STEERING_OFFSET
 from pyvesc.VESC import VESC
 from autopilot import get_action 
 
@@ -17,6 +18,7 @@ MAX_SPEED      = 0.30
 REVERSE_SPEED  = -0.05
 STEERING_CENTER = 0.5
 STEERING_RANGE  = 1.0
+STEERING_OFFSET = 0.02
 
 # --- Constantes Autopilot ---
 ACTION_CFG_PATH = "action_config.json"
@@ -81,6 +83,7 @@ try:
             speed, steer = action[0]
             servo_cmd = (-steer)/2 + 0.5
             speed_cmd = np.clip(speed, 0.02, 0.03)
+            servo_cmd += STEERING_OFFSET
             vesc.set_servo(servo_cmd)
             vesc.set_duty_cycle(speed_cmd)
             print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}")
