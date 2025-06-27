@@ -48,10 +48,8 @@ last_time = time.time()
 
 def update_position(x, y, theta, speed, steer, dt):
     steer_angle = (steer - 0.5) * 2 * MAX_STEERING_ANGLE
-    # print(speed, theta, dt)
     dx = speed * math.cos(theta) * dt
     dy = speed * math.sin(theta) * dt
-    # print(dx, dy)
     dtheta = math.tan(steer_angle) * speed * dt  # simplified kinematics
     x += dx
     y += dy
@@ -161,10 +159,9 @@ try:
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
 
             # === [MODIFIED] === Update and log coordinates in manual mode ===
-            sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
-            sim_steer = np.clip(steering, 0.0, 1.0)
-            print(speed, sim_speed, steering, sim_steer)
-            x, y, theta = update_position(x, y, theta, sim_speed, sim_steer, dt)
+            # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
+            # sim_steer = np.clip(steering, 0.0, 1.0)
+            x, y, theta = update_position(x, y, theta, speed, steering, dt)
             track.append((x, y, now))
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
