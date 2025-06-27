@@ -49,13 +49,13 @@ try:
         if activated:
             steer_input = joystick.get_axis(0)
             steering = STEERING_CENTER + (steer_input * STEERING_RANGE / 2)
-            steering += STEERING_OFFSET
             steering = max(0.0, min(1.0, steering))
             if joystick.get_button(BUTTON_RB):
                 speed = REVERSE_SPEED
             else:
                 rt_input = joystick.get_axis(5)
                 speed = (rt_input + 1) * (MAX_SPEED / 2)
+            steering += STEERING_OFFSET
             vesc.set_servo(steering)
             vesc.set_duty_cycle(speed)
             print(f"Steering: {steering:.2f} | Speed: {speed:.3f}")
