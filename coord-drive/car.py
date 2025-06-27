@@ -87,11 +87,7 @@ try:
         # — gestion des événements —
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # === [MODIFIED] === Reset all state on window close ===
-                print("🗑️ Reset triggered via window X")
-                x, y, theta = 0.0, 0.0, 0.0
-                track.clear()
-                last_time = time.time()
+                raise KeyboardInterrupt
             if event.type == pygame.JOYBUTTONDOWN:
                 if event.button == BUTTON_B:
                     is_autopilot = not is_autopilot
@@ -108,6 +104,12 @@ try:
                         plt.axis("equal")
                         plt.grid(True)
                         plt.show()
+                elif event.button == BUTTON_X:
+                    print("🗑️ Reset triggered via window X")
+                    x, y, theta = 0.0, 0.0, 0.0
+                    track.clear()
+                    last_time = time.time()
+
 
         cfg_mtime = os.path.getmtime(ACTION_CFG_PATH)
         if cfg_mtime != last_cfg_mtime:
