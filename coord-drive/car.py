@@ -82,6 +82,7 @@ try:
             speed, steer = action[0]
             servo_cmd = (-steer)/2 + 0.5
             speed_cmd = np.clip(speed, 0.02, 0.03)
+            servo_cmd += STEERING_OFFSET
             vesc.set_servo(servo_cmd)
             vesc.set_duty_cycle(speed_cmd)
             print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}")
