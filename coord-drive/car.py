@@ -17,7 +17,7 @@ MAX_SPEED      = 0.30
 REVERSE_SPEED  = -0.05
 STEERING_CENTER = 0.5
 STEERING_RANGE  = 1.0
-STEERING_OFFSET = -0.02
+STEERING_OFFSET = -0.04
 
 # --- Constantes Autopilot ---
 ACTION_CFG_PATH = "action_config.json"
