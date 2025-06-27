@@ -82,7 +82,6 @@ try:
             speed, steer = action[0]
             servo_cmd = (-steer)/2 + 0.5
             speed_cmd = np.clip(speed, 0.02, 0.03)
-            servo_cmd += STEERING_OFFSET
             vesc.set_servo(servo_cmd)
             vesc.set_duty_cycle(speed_cmd)
             print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}")
@@ -91,6 +90,7 @@ try:
             # — mode manuel —
             steer_in = joy.get_axis(AXIS_STEER)
             steering = STEERING_CENTER + steer_in * STEERING_RANGE/2
+            steering += STEERING_OFFSET
             steering = np.clip(steering, 0.0, 1.0)
 
             lt = joy.get_axis(AXIS_LT)
@@ -102,7 +102,7 @@ try:
 
             vesc.set_servo(steering)
             vesc.set_duty_cycle(speed)
-            print(f"[MAN] steering={steering:.2f} | speed={speed:.3f}")
+            print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
 
         time.sleep(0.01)
 
