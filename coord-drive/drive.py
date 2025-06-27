@@ -56,10 +56,10 @@ try:
                 rt_input = joystick.get_axis(5)
                 speed = (rt_input + 1) * (MAX_SPEED / 2)
             steering += STEERING_OFFSET
-            print("test?")
-            vesc.set_servo(steering + STEERING_OFFSET)
+            print("test!")
+            vesc.set_servo(steering)
             vesc.set_duty_cycle(speed)
-            print(f"Steering: {steering + STEERING_OFFSET:.2f} | Speed: {speed:.3f}")
+            print(f"Steering: {steering:.2f} | Speed: {speed:.3f}")
         else:
             vesc.set_duty_cycle(0)
         time.sleep(0.01)
