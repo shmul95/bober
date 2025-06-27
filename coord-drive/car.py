@@ -103,7 +103,7 @@ try:
                         plt.ylabel("y")
                         plt.axis("equal")
                         plt.grid(True)
-                        plt.savefig("plot.png")
+                        plt.savefig("plot/plot.png")
                         plt.close()
                         print("📸 Trajectory saved to plot.png")
                 elif event.button == BUTTON_X:

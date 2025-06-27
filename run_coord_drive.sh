@@ -10,4 +10,5 @@ docker run --privileged \
   -e SDL_VIDEODRIVER=dummy \
   --device /dev/ttyACM0:/dev/ttyACM0 \
   -v "$HOST_CAM_DIR":"$CONTAINER_APP_DIR/camera":ro \
+  -v ~/robocar/coord-drive/plot:/app/plot \
   "$IMAGE"
