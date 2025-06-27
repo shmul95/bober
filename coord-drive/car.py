@@ -86,7 +86,7 @@ try:
 
         # — gestion des événements —
         for event in pygame.event.get():
-            print(f"{event=}")
+            # print(f"{event=}")
             if event.type == pygame.QUIT:
                 raise KeyboardInterrupt
             if event.type == pygame.JOYBUTTONDOWN:
@@ -95,6 +95,7 @@ try:
                     mode = "AUTOPILOT" if is_autopilot else "MANUEL"
                     print(f"🔄 Passage en mode {mode}")
                 elif event.button == BUTTON_Y:
+                    print("plot !")
                     if track:
                         df = pd.DataFrame(track, columns=["x", "y", "timestamp"])
                         plt.plot(df["x"], df["y"], marker='o')
@@ -159,14 +160,14 @@ try:
 
             vesc.set_servo(steering + STEERING_OFFSET)
             vesc.set_duty_cycle(speed)
-            print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
+            # print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
 
             # === [MODIFIED] === Update and log coordinates in manual mode ===
             # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
             # sim_steer = np.clip(steering, 0.0, 1.0)
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
             track.append((x, y, now))
-            print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
+            # print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
         time.sleep(0.01)
 
