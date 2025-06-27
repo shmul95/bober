@@ -2,59 +2,72 @@ import cv2
 import numpy as np
 import math
 
-def get_raycasts(image, number_ray=11, fov=130, step_size=1, annotate=True):
-    height, width = image.shape[:2]
-    distances = []
+def get_raycasts(
+    image: np.ndarray,
+    number_ray: int = 11,
+    fov: float = 130,
+    step_size: float = 1.0,
+    threshold: int = 230,
+    annotate: bool = True
+):
+    """
+    Calcule la distance jusqu'au premier pixel 'clair' (> threshold) pour chaque rayon
+    partant du bas-centre de l'image, et renvoie (distances, annotated_image).
 
-    cx = width / 2.0
-    cy = height - 1
+    - On pré-calcul les cos/sin pour chaque rayon.
+    - On fait un seuillage en une passe (gris -> mask bool).
+    - On vérifie les bornes xi, yi avant de lire mask[yi, xi].
+    """
 
-    angle_offset = math.radians(fov / (number_ray - 1))
-    base_angle = math.radians(90)
+    h, w = image.shape[:2]
+    cx, cy = w * 0.5, h - 1.0
 
-    annotated = image.copy()
+    # 1) seuillage binaire (gris > threshold)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    mask = gray > threshold
 
-    for k in range(number_ray):
-        angle = base_angle - fov * math.pi / 360 + k * angle_offset
+    # 2) préparation des angles
+    start_angle = math.radians(90 - fov / 2)
+    angle_step  = math.radians(fov / (number_ray - 1))
+
+    # 3) pré-calcul des incréments (dx, dy) pour chaque rayon
+    deltas = [
+        (math.cos(start_angle + k * angle_step) * step_size,
+         math.sin(start_angle + k * angle_step) * step_size)
+        for k in range(number_ray)
+    ]
+
+    distances = [0] * number_ray
+    annotated = image.copy() if annotate else None
+
+    # 4) boucle par rayon
+    for k, (dx, dy) in enumerate(deltas):
         x, y = cx, cy
-        hit = False
-        hit_dist = 0
+        dist = 0
 
-        while 0 <= x < width and 0 <= y < height:
-            xi = int(round(x))
-            yi = int(round(y))
+        while True:
+            xi = int(x + 0.5)
+            yi = int(y + 0.5)
 
-            if 0 <= xi < width and 0 <= yi < height:
-                pixel = image[yi, xi]
-
-                if pixel[0] > 230 and pixel[1] > 230 and pixel[2] > 230:
-                    distances.append(hit_dist)
-                    hit = True
-                    break
-                
-                if annotate:
-                    annotated[yi, xi] = [255, 0, 0]
-            else:
+            # 4a) si on sort du cadre, on arrête et on stocke la distance
+            if xi < 0 or xi >= w or yi < 0 or yi >= h:
+                distances[k] = dist
                 break
-            
-            x += step_size * math.cos(angle)
-            y -= step_size * math.sin(angle)
-            hit_dist += 1
 
-        if not hit:
-            distances.append(hit_dist)
+            # 4b) si on touche un pixel > threshold, on arrête et on stocke
+            if mask[yi, xi]:
+                distances[k] = dist
+                if annotate:
+                    annotated[yi, xi] = (0, 0, 255)
+                break
+
+            # 4c) sinon on annot le pixel et on continue d'avancer
+            if annotate:
+                annotated[yi, xi] = (0, 0, 255)
+
+            x += dx
+            y -= dy
+            dist += 1
 
     return distances, annotated
 
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-    image = cv2.imread("prediction_mask.png")
-    distances, annotated = get_raycasts(image, number_ray=11, fov=130)
-
-    print("Distances raycasts :", distances)
-
-    plt.figure(figsize=(10, 6))
-    plt.imshow(cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB))
-    plt.title("Raycast")
-    plt.axis("off")
-    plt.show()

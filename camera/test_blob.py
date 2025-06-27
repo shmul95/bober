@@ -1,4 +1,4 @@
-
+import time
 import depthai as dai
 import numpy as np
 import cv2
@@ -32,8 +32,22 @@ xout_nn = pipeline.create(dai.node.XLinkOut)
 xout_nn.setStreamName("nn")
 nn.out.link(xout_nn.input)
 
+# debug
+
+devices = dai.Device.getAllAvailableDevices()
+if not devices: print("no devices")
+else:
+    print(f"found {len(devices)}")
+    for i, dev in enumerate(devices):
+        print(f"\nDevice {i + 1}:")
+        print(f"  MX ID     : {dev.getMxId()}")
+        print(f"  State     : {dev.state}")
+        print(f"  Name      : {dev.name}")
+        print(f"  Protocol  : {dev.protocol.name}")
+
 # Device
-with dai.Device(pipeline) as device:
+time.sleep(1.5)
+with dai.Device(pipeline, usb2Mode=True) as device:
     image_q = device.getOutputQueue("image", maxSize=1, blocking=False)
     nn_q = device.getOutputQueue("nn", maxSize=1, blocking=False)
 

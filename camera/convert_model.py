@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python3
 import torch
 import torch.nn as nn
 import argparse
@@ -46,7 +46,7 @@ class UNet(nn.Module):
 def main(pth_path, onnx_name="unet.onnx", blob_name="unet.blob", input_shape=(1, 3, 192, 320)):
     print(f"Loading PyTorch model from: {pth_path}")
     model = UNet()
-    model.load_state_dict(torch.load(pth_path, map_location="cpu"))
+    model.load_state_dict(torch.load(pth_path, map_location="cpu", weights_only=False))
     model.eval()
 
     dummy_input = torch.randn(input_shape)
@@ -57,19 +57,14 @@ def main(pth_path, onnx_name="unet.onnx", blob_name="unet.blob", input_shape=(1,
         onnx_name,
         input_names=["input"],
         output_names=["output"],
-        dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
         opset_version=11
     )
 
     print(f"Converting to .blob via blobconverter...")
     blob_path = blobconverter.from_onnx(
-        model_path=onnx_name,
-        output_dir=os.path.dirname(os.path.abspath(blob_name)),
+        onnx_name,             # the model path is now the first required arg
         shaves=6,
-        data_type="FP16",
-        compile_params=[],
-        optimizer_params=[],
-        version=None
+        output_dir=os.path.dirname(os.path.abspath(blob_name)),
     )
 
     print(f"✅ Blob saved to: {blob_path}")
