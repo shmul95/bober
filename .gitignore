@@ -5,3 +5,5 @@ data/
 ia_c/
 __pycache__/
 robocar_clem
+camera/unet.onnx
+camera/unet_openvino_2022.1_6shave.blob
