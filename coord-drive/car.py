@@ -86,6 +86,7 @@ try:
 
         # — gestion des événements —
         for event in pygame.event.get():
+            print(f"{event=}")
             if event.type == pygame.QUIT:
                 raise KeyboardInterrupt
             if event.type == pygame.JOYBUTTONDOWN:
@@ -94,7 +95,6 @@ try:
                     mode = "AUTOPILOT" if is_autopilot else "MANUEL"
                     print(f"🔄 Passage en mode {mode}")
                 elif event.button == BUTTON_Y:
-                    # === [MODIFIED] === Plot the recorded track ===
                     if track:
                         df = pd.DataFrame(track, columns=["x", "y", "timestamp"])
                         plt.plot(df["x"], df["y"], marker='o')
