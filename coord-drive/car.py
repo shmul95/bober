@@ -189,7 +189,7 @@ try:
             # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
             # sim_steer = np.clip(steering, 0.0, 1.0)
             msg = vesc.get_measurements()
-            print(f"get_measurements: {"none" if msg is None else msg.duty_cycle_now}", end=" ")
+            print(f"get_measurements: {"none" if msg is None else msg.duty_cycle_now}")
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
             track.append((x, y, now))
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
