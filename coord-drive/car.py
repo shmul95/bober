@@ -62,8 +62,7 @@ def update_position(x, y, theta, speed, steer, dt):
 def find_closest_target(x, y, path):
     positions = np.array([(px, py) for px, py, _, _, _, _ in path])
     dists = np.linalg.norm(positions - np.array([x, y]), axis=1)
-    index = np.argmin(dists)
-    return path[index]
+    return np.argmin(dists)
 
 # --- Initialisation ---
 pygame.init()
@@ -147,18 +146,23 @@ try:
 
         if is_autopilot:
             # Get latest position
-            closest = find_closest_target(x, y, track)
-            speed, steer = closest[2], closest[3]
+            # closest = find_closest_target(x, y, track)
+            # speed, steer = closest[2], closest[3]
+            index = find_closest_target(x, y, track)
+            x, y, theta, speed, steering, _ = track[index]
 
             # servo_cmd = (-steer)/2 + 0.5
-            servo_cmd = steer
-            speed_cmd = np.clip(speed, 0.02, 0.03)
-            print(speed, speed_cmd, steer, servo_cmd)
-            vesc.set_servo(servo_cmd)
-            vesc.set_duty_cycle(speed_cmd)
+            # servo_cmd = steer
+            # speed_cmd = np.clip(speed, 0.02, 0.03)
+            # print(speed, speed_cmd, steer, servo_cmd)
+            # vesc.set_servo(servo_cmd)
+            # vesc.set_duty_cycle(speed_cmd)
 
-            x, y, theta = update_position(x, y, theta, speed_cmd, servo_cmd, dt)
-            print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}", end=" ")
+            vesc.set_servo(steering)
+            vesc.set_duty_cycle(speed)
+
+            x, y, theta = update_position(x, y, theta, speed, steering, dt)
+            print(f"[AP] ({x=:.2f} {y=:.2f} {theta=:.2f} {speed=:.2f} {steering=:.2f}) {speed=:.3f} {steering=:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
         else:
