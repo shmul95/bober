@@ -15,8 +15,8 @@ import pandas as pd
 
 # --- Constantes Manette ---
 BUTTON_A = 0
-BUTTON_X = 1
-BUTTON_B = 2
+BUTTON_B = 1
+BUTTON_X = 2
 BUTTON_Y = 3
 BUTTON_LB = 4
 BUTTON_RB = 5
@@ -25,8 +25,8 @@ AXIS_STEER = 0
 AXIS_LT    = 2
 AXIS_RT    = 5
 
-MAX_SPEED      = 0.30
-REVERSE_SPEED  = -0.05
+MAX_SPEED      = 0.15
+REVERSE_SPEED  = -0.025
 STEERING_CENTER = 0.5
 STEERING_RANGE  = 1.0
 STEERING_OFFSET = -0.05
@@ -168,19 +168,27 @@ try:
 
         else:
             steer_in = joy.get_axis(AXIS_STEER)
-            steering = STEERING_CENTER + steer_in * STEERING_RANGE/2
+            steering = STEERING_CENTER + steer_in * STEERING_RANGE
             steering = np.clip(steering, 0.0, 1.0)
 
-            lt = joy.get_axis(AXIS_LT)
-            if lt != -1.0:
-                speed = (lt + 1)* (REVERSE_SPEED/2)
-            else:
-                rt = joy.get_axis(AXIS_RT)
-                speed = (rt + 1)* (MAX_SPEED/2)
+            speed = 0
+            for event in pygame.event.get():
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == BUTTON_LB:
+                        speed = -MAX_SPEED / 2
+                    if event.button == BUTTON_RB:
+                        speed = MAX_SPEED / 2
+            if speed == 0:
+                lt = joy.get_axis(AXIS_LT)
+                if lt != -1.0:
+                    speed = (lt + 1)* (REVERSE_SPEED)
+                else:
+                    rt = joy.get_axis(AXIS_RT)
+                    speed = (rt + 1)* (MAX_SPEED)
 
             vesc.set_servo(steering + STEERING_OFFSET)
             vesc.set_duty_cycle(speed)
-            print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end="")
+            print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
 
             # === [MODIFIED] === Update and log coordinates in manual mode ===
             # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
