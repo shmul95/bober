@@ -29,7 +29,7 @@ MAX_SPEED      = 0.15
 REVERSE_SPEED  = -0.025
 STEERING_CENTER = 0.5
 STEERING_RANGE  = 1.0
-STEERING_OFFSET = -0.05
+STEERING_OFFSET = 0
 
 # === [MODIFIED] === Steering Angle Parameters ===
 MAX_STEERING_ANGLE = math.radians(30)  # 30 degrees in radians
