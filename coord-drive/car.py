@@ -59,6 +59,12 @@ def update_position(x, y, theta, speed, steer, dt):
     theta += dtheta
     return x, y, theta
 
+def find_closest_target(x, y, path):
+    positions = np.array([(px, py) for px, py, _, _ in path])
+    dists = np.linalg.norm(positions - np.array([x, y]), axis=1)
+    index = np.argmin(dists)
+    return path[index]
+
 # --- Initialisation ---
 pygame.init()
 pygame.joystick.init()
@@ -140,29 +146,17 @@ try:
             print("🔄 Config autopilot rechargée")
 
         if is_autopilot:
-            dist_file = os.path.join("camera", "cam_mask", "distance.txt")
-            if os.path.exists(dist_file):
-                mtime = os.path.getmtime(dist_file)
-                if mtime != last_dist_mtime:
-                    last_dist_mtime = mtime
-                    with open(dist_file) as f:
-                        parts = [float(x) for x in f.read().split(",") if x]
-                    if len(parts) == NB_RAYCAST:
-                        last_vis = np.array(parts, dtype=np.float32)
-                    else:
-                        print(f"⚠️ attendu {NB_RAYCAST} valeurs, reçu {len(parts)}")
-            action, is_reversing = get_action(last_vis, cfg, is_reversing)
-            speed, steer = action[0]
+            # Get latest position
+            closest = find_closest_target(x, y, reference_path)
+            speed, steer = closest[2], closest[3]
+
             servo_cmd = (-steer)/2 + 0.5
             speed_cmd = np.clip(speed, 0.02, 0.03)
             vesc.set_servo(servo_cmd)
             vesc.set_duty_cycle(speed_cmd)
-            print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}", end=" ")
 
-            sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
-            sim_steer = np.clip(steer, 0.0, 1.0)
-            x, y, theta = update_position(x, y, theta, sim_speed, sim_steer, dt)
-            track.append((x, y, theta, speed_cmd, servo_cmd, now))
+            x, y, theta = update_position(x, y, theta, speed_cmd, servo_cmd, dt)
+            print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
         else:
@@ -186,6 +180,7 @@ try:
 
             msg = vesc.get_measurements()
             speed = speed if msg is None else msg.duty_cycle_now
+
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
             track.append((x, y, theta, speed, steering, now))
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
