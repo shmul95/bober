@@ -33,7 +33,7 @@ STEERING_OFFSET = 0
 
 # === [MODIFIED] === Steering Angle Parameters ===
 MAX_STEERING_ANGLE = np.radians(30)  # 30 degrees in radians
-WHEELBASE = 0.0265  # meters
+WHEELBASE = 0.0255  # meters
 
 # --- Constantes Autopilot ---
 ACTION_CFG_PATH = "action_config.json"
@@ -179,7 +179,7 @@ try:
             speed = speed if msg is None else msg.duty_cycle_now
 
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
-            if speed != 0: track.append((x, y, theta, speed, steering, now))
+            if speed > 0: track.append((x, y, theta, speed, steering, now))
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta)%360:.1f}°")
 
