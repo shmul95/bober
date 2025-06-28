@@ -149,7 +149,7 @@ try:
             # closest = find_closest_target(x, y, track)
             # speed, steer = closest[2], closest[3]
             index = find_closest_target(x, y, track)
-            x, y, theta, speed, steering, _ = track[index]
+            _, _, _, speed, steering, _ = track[index]
 
             # servo_cmd = (-steer)/2 + 0.5
             # servo_cmd = steer
@@ -162,7 +162,7 @@ try:
             vesc.set_duty_cycle(speed)
 
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
-            print(f"[AP] ([{index}] {x=:.2f} {y=:.2f} {theta=:.2f} {speed=:.2f} {steering=:.2f}) {speed=:.3f} {steering=:.3f}", end=" ")
+            print(f"[AP] ([{index}] {speed=:.2f} {steering=:.2f}) {speed=:.3f} {steering=:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
         else:
