@@ -60,9 +60,10 @@ def update_position(x, y, theta, speed, steer, dt):
     return x, y, theta
 
 def find_closest_target(x, y, path):
-    positions = np.array([(px, py) for px, py, _, _, _, _ in path])
-    dists = np.linalg.norm(positions - np.array([x, y]), axis=1)
-    return np.argmin(dists)
+    if len(path):
+        positions = np.array([(px, py) for px, py, _, _, _, _ in path])
+        dists = np.linalg.norm(positions - np.array([x, y]), axis=1)
+        return np.argmin(dists)
 
 # --- Initialisation ---
 pygame.init()
@@ -145,18 +146,8 @@ try:
             print("🔄 Config autopilot rechargée")
 
         if is_autopilot:
-            # Get latest position
-            # closest = find_closest_target(x, y, track)
-            # speed, steer = closest[2], closest[3]
             index = find_closest_target(x, y, track)
             _, _, _, speed, steering, _ = track[index]
-
-            # servo_cmd = (-steer)/2 + 0.5
-            # servo_cmd = steer
-            # speed_cmd = np.clip(speed, 0.02, 0.03)
-            # print(speed, speed_cmd, steer, servo_cmd)
-            # vesc.set_servo(servo_cmd)
-            # vesc.set_duty_cycle(speed_cmd)
 
             vesc.set_servo(steering)
             vesc.set_duty_cycle(speed)
@@ -188,7 +179,7 @@ try:
             speed = speed if msg is None else msg.duty_cycle_now
 
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
-            track.append((x, y, theta, speed, steering, now))
+            if speed != 0: track.append((x, y, theta, speed, steering, now))
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta)%360:.1f}°")
 
