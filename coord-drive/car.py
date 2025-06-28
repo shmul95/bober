@@ -14,10 +14,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # --- Constantes Manette ---
-BUTTON_A = 0
-BUTTON_B = 1
-BUTTON_X = 2
+BUTTON_X = 0
+BUTTON_A = 1
+BUTTON_B = 2
 BUTTON_Y = 3
+BUTTON_LB = 4
+BUTTON_RB = 5
 
 AXIS_STEER = 0
 AXIS_LT    = 2
@@ -52,7 +54,7 @@ def update_position(x, y, theta, speed, steer, dt):
     dx = speed * math.sin(theta) * dt
     dy = speed * math.cos(theta) * dt
     dtheta = math.tan(steer_angle) * speed * dt * steering_bias  # simplified kinematics
-    x += dx
+    x -= dx
     y -= dy
     theta += dtheta
     return x, y, theta
