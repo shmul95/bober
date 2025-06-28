@@ -98,7 +98,7 @@ try:
                     print(f"🔄 Passage en mode {mode}")
                 elif event.button == BUTTON_Y:
                     if track:
-                        df = pd.DataFrame(track, columns=["x", "y", "timestamp"])
+                        df = pd.DataFrame(track, columns=["x", "y", "theta", "speed", "steerig", "timestamp"])
 
                         # === [MODIFIED] === Enhanced plot: black background, rainbow time gradient
                         plt.style.use('dark_background')
@@ -157,13 +157,12 @@ try:
             speed_cmd = np.clip(speed, 0.02, 0.03)
             vesc.set_servo(servo_cmd)
             vesc.set_duty_cycle(speed_cmd)
-            print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}")
+            print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}", end=" ")
 
-            # === [MODIFIED] === Update and log coordinates in autopilot ===
             sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
             sim_steer = np.clip(steer, 0.0, 1.0)
             x, y, theta = update_position(x, y, theta, sim_speed, sim_steer, dt)
-            track.append((x, y, now))
+            track.append((x, y, theta, speed_cmd, servo_cmd, now))
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
         else:
@@ -185,14 +184,10 @@ try:
             vesc.set_servo(steering + STEERING_OFFSET)
             vesc.set_duty_cycle(speed)
 
-            # === [MODIFIED] === Update and log coordinates in manual mode ===
-            # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
-            # sim_steer = np.clip(steering, 0.0, 1.0)
             msg = vesc.get_measurements()
-            # print(f"get_measurements: {"none" if msg is None else msg.duty_cycle_now}")
             speed = speed if msg is None else msg.duty_cycle_now
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
-            track.append((x, y, now))
+            track.append((x, y, theta, speed, steering, now))
             print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta)%360:.1f}°")
 
