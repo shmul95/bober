@@ -173,6 +173,7 @@ try:
 
             speed = 0
             for event in pygame.event.get():
+                print(event)
                 if event.type == pygame.JOYBUTTONDOWN:
                     if event.button == BUTTON_LB:
                         speed = -MAX_SPEED / 2
