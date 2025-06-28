@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # --- Constantes Manette ---
-BUTTON_X = 0
-BUTTON_A = 1
+BUTTON_A = 0
+BUTTON_X = 1
 BUTTON_B = 2
 BUTTON_Y = 3
 BUTTON_LB = 4
@@ -92,7 +92,7 @@ try:
             if event.type == pygame.QUIT:
                 raise KeyboardInterrupt
             if event.type == pygame.JOYBUTTONDOWN:
-                if event.button == BUTTON_B:
+                if event.button == BUTTON_A:
                     is_autopilot = not is_autopilot
                     mode = "AUTOPILOT" if is_autopilot else "MANUEL"
                     print(f"🔄 Passage en mode {mode}")
@@ -180,14 +180,14 @@ try:
 
             vesc.set_servo(steering + STEERING_OFFSET)
             vesc.set_duty_cycle(speed)
-            # print(f"[MAN] {steering=:.2f} | {speed=:.3f}")
+            print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end="")
 
             # === [MODIFIED] === Update and log coordinates in manual mode ===
             # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
             # sim_steer = np.clip(steering, 0.0, 1.0)
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
             track.append((x, y, now))
-            # print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
+            print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
         time.sleep(0.01)
 
