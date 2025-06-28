@@ -150,7 +150,8 @@ try:
             closest = find_closest_target(x, y, track)
             speed, steer = closest[2], closest[3]
 
-            servo_cmd = (-steer)/2 + 0.5
+            # servo_cmd = (-steer)/2 + 0.5
+            servo_cmd = steer
             speed_cmd = np.clip(speed, 0.02, 0.03)
             print(speed, speed_cmd, steer, servo_cmd)
             vesc.set_servo(servo_cmd)
