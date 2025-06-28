@@ -162,7 +162,7 @@ try:
             vesc.set_duty_cycle(speed)
 
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
-            print(f"[AP] ({x=:.2f} {y=:.2f} {theta=:.2f} {speed=:.2f} {steering=:.2f}) {speed=:.3f} {steering=:.3f}", end=" ")
+            print(f"[AP] ([{index}] {x=:.2f} {y=:.2f} {theta=:.2f} {speed=:.2f} {steering=:.2f}) {speed=:.3f} {steering=:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
 
         else:
