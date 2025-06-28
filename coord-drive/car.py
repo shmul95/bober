@@ -53,7 +53,7 @@ def update_position(x, y, theta, speed, steer, dt):
     dy = speed * math.sin(theta) * dt
     dtheta = math.tan(steer_angle) * speed * dt * steering_bias  # simplified kinematics
     x += dx
-    y += dy
+    y -= dy
     theta += dtheta
     return x, y, theta
 
@@ -97,15 +97,32 @@ try:
                 elif event.button == BUTTON_Y:
                     if track:
                         df = pd.DataFrame(track, columns=["x", "y", "timestamp"])
-                        plt.plot(df["x"], df["y"], marker='o')
-                        plt.title("Trajectoire")
-                        plt.xlabel("x")
-                        plt.ylabel("y")
-                        plt.axis("equal")
-                        plt.grid(True)
+
+                        # === [MODIFIED] === Enhanced plot: black background, rainbow time gradient
+                        plt.style.use('dark_background')
+                        fig, ax = plt.subplots()
+
+                        # Normalize time to 0-1 for color mapping
+                        norm_time = (df["timestamp"] - df["timestamp"].min())
+                        norm_time = norm_time / norm_time.max()
+
+                        # Plot with a color map (rainbow)
+                        scatter = ax.scatter(df["x"], df["y"], c=norm_time, cmap="rainbow", s=10)
+
+                        ax.set_title("Trajectoire")
+                        ax.set_xlabel("x")
+                        ax.set_ylabel("y")
+                        ax.axis("equal")
+                        ax.grid(True, color='gray', linestyle='--', linewidth=0.5)
+
+                        # Add colorbar for time reference
+                        cbar = plt.colorbar(scatter, ax=ax, label="Temps (normalisé)")
+
+                        # Ensure directory exists
+                        os.makedirs("plot", exist_ok=True)
                         plt.savefig("plot/plot.png")
                         plt.close()
-                        print("📸 Trajectory saved to plot.png")
+                        print("📸 Trajectory saved to plot/plot.png")
                 elif event.button == BUTTON_X:
                     print("🗑️ Reset triggered via window X")
                     x, y, theta = 0.0, 0.0, 0.0
