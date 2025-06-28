@@ -32,7 +32,8 @@ STEERING_RANGE  = 1.0
 STEERING_OFFSET = 0
 
 # === [MODIFIED] === Steering Angle Parameters ===
-MAX_STEERING_ANGLE = 30  # 30 degrees in radians
+MAX_STEERING_ANGLE = np.radians(30)  # 30 degrees in radians
+WHEELBASE = 0.2  # meters
 
 # --- Constantes Autopilot ---
 ACTION_CFG_PATH = "action_config.json"
@@ -52,9 +53,9 @@ def update_position(x, y, theta, speed, steer, dt):
     steer_angle = (steer - 0.5) * 2 * MAX_STEERING_ANGLE
     dx = speed * math.sin(theta) * dt
     dy = speed * math.cos(theta) * dt
-    dtheta = math.tan(steer_angle) * speed * dt # simplified kinematics
-    x -= dx
-    y -= dy
+    dtheta = (speed / WHEELBASE) * math.tan(steer_angle) * dt
+    x += dx
+    y += dy
     theta += dtheta
     return x, y, theta
 
