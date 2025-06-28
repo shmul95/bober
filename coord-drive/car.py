@@ -189,7 +189,8 @@ try:
             # === [MODIFIED] === Update and log coordinates in manual mode ===
             # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
             # sim_steer = np.clip(steering, 0.0, 1.0)
-            x, y, theta = update_position(x, y, theta, speed, steering, dt)
+            ego_speed = vesc.get_duty_cycle()
+            x, y, theta = update_position(x, y, theta, ego_speed, steering, dt)
             track.append((x, y, now))
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta)%360:.1f}°")
 
