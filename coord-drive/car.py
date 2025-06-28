@@ -2,7 +2,6 @@
 import os
 import time
 import json
-from markupsafe import _speedups
 import numpy as np
 import pygame
 from collections import deque
