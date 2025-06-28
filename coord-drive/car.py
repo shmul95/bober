@@ -184,14 +184,15 @@ try:
 
             vesc.set_servo(steering + STEERING_OFFSET)
             vesc.set_duty_cycle(speed)
-            print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
 
             # === [MODIFIED] === Update and log coordinates in manual mode ===
             # sim_speed = np.interp(speed, [REVERSE_SPEED, MAX_SPEED], [-1, 1])
             # sim_steer = np.clip(steering, 0.0, 1.0)
-            print(vesc.get_measurements().duty_cycle_now)
+            msg = vesc.get_measurements()
+            print(f"get_measurements: {"none" if msg is None else msg.duty_cycle_now}", end=" ")
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
             track.append((x, y, now))
+            print(f"[MAN] {steering=:.2f} | {speed=:.3f}", end=" ")
             print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta)%360:.1f}°")
 
         time.sleep(0.01)
