@@ -172,13 +172,8 @@ try:
             steering = np.clip(steering, 0.0, 1.0)
 
             speed = 0
-            for event in pygame.event.get():
-                print(event)
-                if event.type == pygame.JOYBUTTONDOWN:
-                    if event.button == BUTTON_LB:
-                        speed = -MAX_SPEED / 2
-                    if event.button == BUTTON_RB:
-                        speed = MAX_SPEED / 2
+            if joy.get_button(BUTTON_LB): speed = -MAX_SPEED / 2
+            if joy.get_button(BUTTON_RB): speed =  MAX_SPEED / 2
             if speed == 0:
                 lt = joy.get_axis(AXIS_LT)
                 if lt != -1.0:
@@ -196,7 +191,7 @@ try:
             # sim_steer = np.clip(steering, 0.0, 1.0)
             x, y, theta = update_position(x, y, theta, speed, steering, dt)
             track.append((x, y, now))
-            print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {math.degrees(theta):.1f}°")
+            print(f"📍 Pos: ({x:.2f}, {y:.2f}) | θ: {(math.degrees(theta)%360)-180:.1f}°")
 
         time.sleep(0.01)
 
