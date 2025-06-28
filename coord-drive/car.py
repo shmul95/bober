@@ -33,7 +33,7 @@ STEERING_OFFSET = 0
 
 # === [MODIFIED] === Steering Angle Parameters ===
 MAX_STEERING_ANGLE = np.radians(30)  # 30 degrees in radians
-WHEELBASE = 0.35  # meters
+WHEELBASE = 0.05  # meters
 
 # --- Constantes Autopilot ---
 ACTION_CFG_PATH = "action_config.json"
