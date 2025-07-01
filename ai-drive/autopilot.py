@@ -9,7 +9,11 @@ nb_raycast = 40
 MAX_SPEED = 0.05  # duty_cycle max
 STEERING_CENTER = 0.5
 STEERING_RANGE = 1.0
-
+def compress_rays(ray_list, x_max=94.0, a=1, min_threshold=80.0):
+    return [
+        0.0 if x <= min_threshold else ((x - min_threshold) / (x_max - min_threshold)) ** a
+        for x in ray_list
+    ]
 # === Initialisation manette & VESC ===
 pygame.init()
 pygame.joystick.init()
@@ -27,12 +31,6 @@ vesc = VESC(serial_port="/dev/ttyACM0")
 model = joblib.load("model/driving_model_lgbm.pkl")
 scaler_X = joblib.load("model/scaler_X.save")
 
-def compress_rays(ray_list, x_max=237.0, a=1, min_threshold=220.0):
-    return [
-        0.0 if x <= min_threshold else ((x - min_threshold) / (x_max - min_threshold)) ** a
-        for x in ray_list
-    ]
-
 # === Boucle principale ===
 try:
     autonomous = True
@@ -48,7 +46,7 @@ try:
         if autonomous:
             # === Lire les raycasts depuis fichier
             try:
-                with open("distance.txt", "r") as f:
+                with open("camera/data/distance.txt", "r") as f:
                     line = f.readline().strip()
                     ray_values = [int(x) for x in line.split(",") if x.strip()]
                 if len(ray_values) < nb_raycast:
@@ -57,14 +55,14 @@ try:
             except Exception as e:
                 print("Erreur lecture raycasts :", e)
                 continue
-
-            # === Préparation features
-            compressed = compress_rays(ray_values)
-            X = np.array(compressed).reshape(1, -1)
+            ray_values = compress_rays(ray_values)
+            # === Utilisation directe des valeurs
+            print("Ray values (raw):", ray_values)
+            X = np.array(ray_values).reshape(1, -1)
             X_scaled = scaler_X.transform(X)
 
             # === Prédiction
-            speed_pred, steering_pred, brake_pred = model.predict(X_scaled)[0]
+            brake_pred, speed_pred, steering_pred = model.predict(X_scaled)[0]
 
             # === Application du frein
             if brake_pred > 0.5 and speed_pred > 0.1:
@@ -82,7 +80,7 @@ try:
             vesc.set_servo(steering)
             vesc.set_duty_cycle(duty)
 
-            print(f"🔮 Speed: {duty:.3f} | Steering: {steering:.2f} | brake: {brake_pred:.2f}")
+            print(f"🔮 Speed: {duty:.3f} | Steering: {steering:.2f} | Break: {brake_pred:.2f}")
 
         else:
             # Mode manuel → arrêt du moteur

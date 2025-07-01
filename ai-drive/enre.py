@@ -44,13 +44,21 @@ csv_writer = csv.writer(csv_file)
 # En-tête
 csv_writer.writerow([f"ray_{i}" for i in range(nb_raycast)] + ["speed", "steering", "brake"])
 
+def compress_rays(ray_list, x_max=94.0, a=1, min_threshold=80.0):
+    return [
+        0.0 if x <= min_threshold else ((x - min_threshold) / (x_max - min_threshold)) ** a
+        for x in ray_list
+    ]
+
 def get_action():
     global steering
     return np.array([[current_speed, steering]], dtype=np.float32)
 
 try:
     prev_button_r1 = False
-
+    prev_button_a = False
+    prev_button_b = False
+    
     print("🚗 Contrôle manuel IRL démarré.")
     while True:
         pygame.time.Clock().tick(30)
@@ -60,7 +68,9 @@ try:
                 raise KeyboardInterrupt
 
         button_r1 = joystick.get_button(BUTTON_R1)
-
+        button_a = joystick.get_button(BUTTON_A)
+        button_b = joystick.get_button(BUTTON_B)
+        
         # Toggle boost (click R1)
         if prev_button_r1 and not button_r1:
             boost_mode = not boost_mode
@@ -77,7 +87,7 @@ try:
             braking = 0
             print("🟢 Accélération R2 →", current_speed)
         else:
-            current_speed = max(0.0, current_speed - 0.01)
+            # current_speed = max(0.0, current_speed - 0.01)
             braking = 1
             print("⚠️ Frein moteur     →", current_speed)
 
@@ -126,11 +136,15 @@ try:
             print(f"Erreur lecture distance.txt: {e}")
             raycast_data = [0.0] * nb_raycast
 
-        print(raycast_data)
+        # print(raycast_data)
+        raycast_data = compress_rays(raycast_data)
         # Écrit dans le CSV
         csv_writer.writerow(raycast_data + [speed_val, steering_val, braking])
 
         print(f"🚗 Duty: {speed_val:.3f} | Servo: {servo_cmd:.2f} | Boost: {boost_mode} | Brake: {braking}")
+        prev_button_r1 = button_r1
+        prev_button_a = button_a
+        prev_button_b = button_b
         time.sleep(0.01)
 
 except KeyboardInterrupt:
