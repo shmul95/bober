@@ -64,10 +64,10 @@ try:
             X_scaled = scaler_X.transform(X)
 
             # === Prédiction
-            speed_pred, steering_pred, break_pred = model.predict(X_scaled)[0]
+            speed_pred, steering_pred, brake_pred = model.predict(X_scaled)[0]
 
             # === Application du frein
-            if break_pred > 0.5 and speed_pred > 0.1:
+            if brake_pred > 0.5 and speed_pred > 0.1:
                 duty = 0.0
                 print("🟥 Freinage activé")
             else:
@@ -82,7 +82,7 @@ try:
             vesc.set_servo(steering)
             vesc.set_duty_cycle(duty)
 
-            print(f"🔮 Speed: {duty:.3f} | Steering: {steering:.2f} | Break: {break_pred:.2f}")
+            print(f"🔮 Speed: {duty:.3f} | Steering: {steering:.2f} | brake: {brake_pred:.2f}")
 
         else:
             # Mode manuel → arrêt du moteur
