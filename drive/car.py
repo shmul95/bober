@@ -13,14 +13,14 @@ AXIS_STEER = 0
 AXIS_LT    = 2
 AXIS_RT    = 5
 
-MAX_SPEED      = 0.30
+MAX_SPEED      = 0.40
 REVERSE_SPEED  = -0.05
 STEERING_CENTER = 0.5
 STEERING_RANGE  = 1.0
 
 # --- Constantes Autopilot ---
 ACTION_CFG_PATH = "action_config.json"
-NB_RAYCAST      = 40
+NB_RAYCAST      = 60
 
 def load_config():
     with open(ACTION_CFG_PATH) as f:
@@ -66,7 +66,7 @@ try:
 
         if is_autopilot:
             # — lecture distances (comme dans autopilot.py) —
-            dist_file = os.path.join("camera", "cam_mask", "distance.txt")
+            dist_file = os.path.join("camera", "data", "distance.txt")
             if os.path.exists(dist_file):
                 mtime = os.path.getmtime(dist_file)
                 if mtime != last_dist_mtime:
@@ -80,7 +80,7 @@ try:
             action, is_reversing = get_action(last_vis, cfg, is_reversing)
             speed, steer = action[0]
             servo_cmd = (-steer)/2 + 0.5
-            speed_cmd = np.clip(speed, 0.02, 0.03)
+            speed_cmd = np.clip(speed, 0.04, 0.04)
             vesc.set_servo(servo_cmd)
             vesc.set_duty_cycle(speed_cmd)
             print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}")
@@ -102,8 +102,7 @@ try:
             vesc.set_duty_cycle(speed)
             print(f"[MAN] steering={steering:.2f} | speed={speed:.3f}")
 
-        time.sleep(0.01)
-
+            time.sleep(0.02)
 except KeyboardInterrupt:
     pass
 

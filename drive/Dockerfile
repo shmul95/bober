@@ -21,7 +21,6 @@ RUN git clone --depth 1 https://github.com/shmul95/pyvesc.git /tmp/pyvesc \
  && rm -rf /tmp/pyvesc
 
 COPY action_config.json .
-COPY drive.py .
 COPY autopilot.py .
 COPY car.py .
 

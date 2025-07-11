@@ -46,7 +46,7 @@ class UNet(nn.Module):
 def main(pth_path, onnx_name="unet.onnx", blob_name="unet.blob", input_shape=(1, 3, 192, 320)):
     print(f"Loading PyTorch model from: {pth_path}")
     model = UNet()
-    model.load_state_dict(torch.load(pth_path, map_location="cpu", weights_only=False))
+    model.load_state_dict(torch.load(pth_path, map_location="cpu"))
     model.eval()
 
     dummy_input = torch.randn(input_shape)

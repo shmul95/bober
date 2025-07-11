@@ -71,7 +71,7 @@ cam = pipeline.create(dai.node.ColorCamera)
 cam.setBoardSocket(dai.CameraBoardSocket.RGB)
 cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
 cam.setPreviewSize(IMG_W, IMG_H)
-cam.setFps(30)
+cam.setFps(5)
 
 xout = pipeline.create(dai.node.XLinkOut)
 xout.setStreamName("rgb")
@@ -96,26 +96,21 @@ with dai.Device(pipeline, maxUsbSpeed=dai.UsbSpeed.HIGH) as device:
                          / 255.0
                   ).to(DEVICE)
 
-        # forward
         with torch.no_grad():
             pred = torch.sigmoid(model(tensor))[0,0].cpu().numpy()
         mask = (pred > 0.5).astype(np.uint8) * 255
 
-        # raycasts (annotation disabled for perf)
         distances, _ = get_raycasts(
-            cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR),
+            cv2.merge([mask]*3),
             number_ray=40, fov=180, annotate=False
         )
 
-        # write distances only
         dist_path = os.path.join(OUT_DIR, "distance.txt")
         with open(dist_path, "w") as f:
             f.write(",".join(str(d) for d in distances))
 
         frame_idx += 1
         print(f"[Frame {frame_idx}]")
-
-        # stop flag
         if os.path.exists(os.path.join(OUT_DIR, "stop.flag")):
             print("→ fin de la boucle")
             break
