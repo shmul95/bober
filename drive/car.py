@@ -8,7 +8,7 @@ from pyvesc.VESC import VESC
 from autopilot import get_action 
 
 # --- Constantes Manette ---
-BUTTON_B = 1            # vérifiez avec un print(event.button) si besoin
+BUTTON_B = 1
 AXIS_STEER = 0
 AXIS_LT    = 2
 AXIS_RT    = 5
@@ -48,24 +48,22 @@ print("Appuyez sur B pour basculer MANUEL ↔ AUTOPILOT")
 
 try:
     while True:
-        # — gestion des événements —
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 raise KeyboardInterrupt
             if event.type == pygame.JOYBUTTONDOWN and event.button == BUTTON_B:
                 is_autopilot = not is_autopilot
                 mode = "AUTOPILOT" if is_autopilot else "MANUEL"
-                print(f"🔄 Passage en mode {mode}")
+                print(f" Passage en mode {mode}")
 
         cfg_mtime = os.path.getmtime(ACTION_CFG_PATH)
         if cfg_mtime != last_cfg_mtime:
             cfg = load_config()
             vision_hist = deque(maxlen=cfg["HISTORY_SIZE"])
             last_cfg_mtime = cfg_mtime
-            print("🔄 Config autopilot rechargée")
+            print(" Config autopilot rechargée")
 
         if is_autopilot:
-            # — lecture distances (comme dans autopilot.py) —
             dist_file = os.path.join("camera", "data", "distance.txt")
             if os.path.exists(dist_file):
                 mtime = os.path.getmtime(dist_file)
@@ -86,7 +84,6 @@ try:
             print(f"[AP] speed={speed_cmd:.3f} servo={servo_cmd:.3f}")
 
         else:
-            # — mode manuel —
             steer_in = joy.get_axis(AXIS_STEER)
             steering = STEERING_CENTER + steer_in * STEERING_RANGE/2
             steering = np.clip(steering, 0.0, 1.0)

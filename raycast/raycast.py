@@ -145,7 +145,6 @@ def main():
 
         dists = get_raycasts(img)
 
-        # atomic write of distances (comma separated)
         text = ",".join(map(str, dists)).encode("utf-8")
         atomic_write(OUTPUT_FILE, text)
 

@@ -6,17 +6,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /app
 
-# Supprime le dépôt Kitware qui posait problème
 RUN rm -f /etc/apt/sources.list.d/kitware* \
  && sed -i '/kitware/d' /etc/apt/sources.list
 
-# Mets à jour et installe seulement OpenCV + NumPy
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       python3-opencv \
     && rm -rf /var/lib/apt/lists/*
 
-# Copie et exécute votre script
 COPY raycast.py .
 
 CMD ["python3", "raycast.py"]

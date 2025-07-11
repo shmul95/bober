@@ -32,12 +32,8 @@ def open_device(pipeline):
     return dev, q_cam
 
 def atomic_write(path, img):
-    """
-    Écrit d'abord dans un fichier temporaire qui garde la même extension
-    (pour que OpenCV puisse le writer), puis remplace atomiquement.
-    """
     base, ext = os.path.splitext(path)
-    tmp = f"{base}.tmp{ext}"     # ex: frame.tmp.png
+    tmp = f"{base}.tmp{ext}"
     cv2.imwrite(tmp, img)
     os.replace(tmp, path)
 
@@ -77,7 +73,6 @@ def main():
                 print(f"[BENCH] 30 frames en {elapsed:.2f}s → {fps_measured:.1f} FPS")
                 bench_start = time.time()
 
-            # Légère pause pour ne pas saturer l'USB
             time.sleep(0.001)
 
     except KeyboardInterrupt:
