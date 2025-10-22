@@ -1,0 +1,9 @@
+[submodule "sensors"]
+	path = sensors
+	url = git@github.com:shmul95/bober-sensors.git
+[submodule "ai"]
+	path = ai
+	url = git@github.com:shmul95/bober-ai.git
+[submodule "app"]
+	path = app
+	url = git@github.com:shmul95/bober-app.git
